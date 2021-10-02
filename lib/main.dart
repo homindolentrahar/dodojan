@@ -1,6 +1,13 @@
+import 'package:dodojan/core/di/app_module.dart';
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:dodojan/core/common/theme/app_theme.dart';
+import 'package:dodojan/core/presentation/routes/app_routes.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  AppModule.inject();
+
   runApp(const DodojanApp());
 }
 
@@ -9,13 +16,12 @@ class DodojanApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: "Dodojan",
-      home: Scaffold(
-        body: Center(
-          child: Text("Dodojan"),
-        ),
-      ),
+      theme: AppTheme.getTheme(),
+      initialRoute: "/",
+      getPages: AppRoutes.routes,
     );
   }
 }
