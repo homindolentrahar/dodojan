@@ -1,4 +1,7 @@
 import 'package:dodojan/core/presentation/screens/splash_screen.dart';
+import 'package:dodojan/core/presentation/timer_controller.dart';
+import 'package:dodojan/feature/auth/domain/repository/i_auth_repository.dart';
+import 'package:dodojan/feature/auth/presentation/login_controller.dart';
 import 'package:dodojan/feature/auth/presentation/routes/auth_middleware.dart';
 import 'package:dodojan/feature/auth/presentation/screens/auth_profile_screen.dart';
 import 'package:dodojan/feature/auth/presentation/screens/landing_screen.dart';
@@ -19,6 +22,11 @@ class AppRoutes {
       title: "Landing",
       transition: Transition.rightToLeftWithFade,
       middlewares: [AuthMiddleware()],
+      binding: BindingsBuilder(() {
+        Get.put<LoginController>(
+          LoginController(authRepository: Get.find<IAuthRepository>()),
+        );
+      }),
       page: () => const LandingScreen(),
     ),
     GetPage(
@@ -31,6 +39,11 @@ class AppRoutes {
       name: "/otp",
       title: "OTP",
       transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.put<TimerController>(
+          TimerController()..startTime(),
+        );
+      }),
       page: () => const OtpScreen(),
     ),
     GetPage(

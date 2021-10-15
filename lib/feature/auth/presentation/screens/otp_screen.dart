@@ -1,12 +1,12 @@
 import 'package:dodojan/core/common/theme/app_color.dart';
-import 'package:dodojan/core/presentation/timer_cubit.dart';
+import 'package:dodojan/core/presentation/timer_controller.dart';
 import 'package:dodojan/core/presentation/widgets/app_buttons.dart';
 import 'package:dodojan/core/presentation/widgets/app_snackbars.dart';
 import 'package:dodojan/core/utils/value_formatters.dart';
+import 'package:dodojan/feature/auth/presentation/login_controller.dart';
 import 'package:dodojan/feature/auth/presentation/widgets/auth_fields.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get/get.dart';
 
@@ -20,11 +20,13 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   late GlobalKey<FormBuilderState> _formKey;
   late GlobalKey<FormBuilderFieldState> _otpKey;
+  late LoginController _loginController;
 
   @override
   void initState() {
     _formKey = GlobalKey<FormBuilderState>();
     _otpKey = GlobalKey<FormBuilderFieldState>();
+    _loginController = Get.find<LoginController>();
 
     super.initState();
   }
@@ -33,7 +35,7 @@ class _OtpScreenState extends State<OtpScreen> {
     _formKey.currentState?.save();
 
     if (_formKey.currentState!.validate()) {
-      Get.toNamed("/auth-profile");
+      _loginController.signInWithPhone();
     } else {
       Get.showSnackbar(
         AppSnackbars.errorSnackbar(
@@ -42,15 +44,10 @@ class _OtpScreenState extends State<OtpScreen> {
         ),
       );
     }
-
-    _formKey.currentState?.reset();
   }
 
   @override
   Widget build(BuildContext context) {
-    final args = Get.arguments as Map<String, dynamic>;
-    final phone = args["phone"] as String;
-
     return SafeArea(
       child: Scaffold(
         body: ListView(
@@ -71,22 +68,25 @@ class _OtpScreenState extends State<OtpScreen> {
                   style: Get.textTheme.headline1,
                 ),
                 const SizedBox(height: 8),
-                RichText(
-                  text: TextSpan(
-                    style: Get.textTheme.bodyText2,
-                    children: [
-                      const TextSpan(
-                        text:
-                            "Masukkan kode OTP 6 digit yang telah kami kirimkan ke nomor  ",
-                      ),
-                      TextSpan(
-                        text: ValueFormatters.formatPhoneNumber(phone: phone),
-                        style: Get.textTheme.bodyText2?.copyWith(
-                          color: AppColor.black,
-                          fontWeight: FontWeight.bold,
+                GetX<LoginController>(
+                  init: _loginController,
+                  builder: (controller) => RichText(
+                    text: TextSpan(
+                      style: Get.textTheme.bodyText2,
+                      children: [
+                        const TextSpan(
+                          text:
+                              "Masukkan kode OTP 6 digit yang telah kami kirimkan ke nomor  ",
                         ),
-                      ),
-                    ],
+                        TextSpan(
+                          text: controller.state.phone,
+                          style: Get.textTheme.bodyText2?.copyWith(
+                            color: AppColor.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -102,22 +102,25 @@ class _OtpScreenState extends State<OtpScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: OTPPinField(
                       fieldKey: _otpKey,
-                      onChanged: (value) {},
+                      onChanged: (value) {
+                        _loginController.otpChanged(value);
+                      },
                     ),
                   ),
                   const SizedBox(height: 64),
-                  BlocBuilder<TimerCubit, int>(
-                    bloc: TimerCubit()..startTime(),
-                    builder: (ctx, state) => RichText(
+                  GetX<TimerController>(
+                    builder: (controller) => RichText(
                       text: TextSpan(
                         style: Get.textTheme.bodyText2,
                         children: [
                           const TextSpan(
                             text: "Tidak menerima kode?  ",
                           ),
-                          state > 0
+                          controller.state.value > 0
                               ? TextSpan(
-                                  text: ValueFormatters.formatTimer(state),
+                                  text: ValueFormatters.formatTimer(
+                                    controller.state.value,
+                                  ),
                                 )
                               : TextSpan(
                                   text: "Kirim Ulang",

@@ -1,3 +1,5 @@
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+
 class ValueFormatters {
   static String formatTimer(int duration) {
     final minuteSegment = duration / 60;
@@ -10,13 +12,11 @@ class ValueFormatters {
     String code = "+62",
     required String phone,
   }) {
-    var formattedPhone = phone;
-    final firstChar = formattedPhone.substring(0, 1);
-
-    if (firstChar == "0") {
-      formattedPhone = code + formattedPhone.substring(1);
-    }
-
-    return formattedPhone;
+    return code +
+        PhoneNumber(
+          phoneNumber: phone,
+          isoCode: "ID",
+          dialCode: code,
+        ).parseNumber();
   }
 }

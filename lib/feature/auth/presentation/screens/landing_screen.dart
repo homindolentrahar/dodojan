@@ -1,9 +1,24 @@
 import 'package:dodojan/core/presentation/widgets/app_buttons.dart';
+import 'package:dodojan/feature/auth/presentation/login_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-class LandingScreen extends StatelessWidget {
+class LandingScreen extends StatefulWidget {
   const LandingScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LandingScreen> createState() => _LandingScreenState();
+}
+
+class _LandingScreenState extends State<LandingScreen> {
+  late LoginController _loginController;
+
+  @override
+  void initState() {
+    _loginController = Get.find<LoginController>();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +71,9 @@ class LandingScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 SecondaryButton(
                   text: "Google",
-                  onPressed: () {},
+                  onPressed: () {
+                    _loginController.signInWithGoogle();
+                  },
                 ),
               ],
             ),

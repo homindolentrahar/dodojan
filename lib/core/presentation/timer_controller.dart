@@ -1,25 +1,18 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
+import 'package:get/get.dart';
 
-class TimerCubit extends Cubit<int> {
-  TimerCubit() : super(0);
-
+class TimerController extends GetxController {
   StreamSubscription<int>? _tickerSubscription;
+
+  final Rx<int> state = 0.obs;
 
   void startTime({int duration = 90}) {
     _tickerSubscription?.cancel();
 
     _tickerSubscription = ticker(duration).listen((tick) {
-      emit(tick);
+      state.value = tick;
     });
-  }
-
-  @override
-  Future<void> close() {
-    _tickerSubscription?.cancel();
-
-    return super.close();
   }
 }
 

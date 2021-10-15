@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dodojan/core/presentation/widgets/app_buttons.dart';
 import 'package:dodojan/core/presentation/widgets/app_snackbars.dart';
 import 'package:dodojan/core/utils/value_formatters.dart';
+import 'package:dodojan/feature/auth/presentation/login_controller.dart';
 import 'package:dodojan/feature/auth/presentation/widgets/auth_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -17,10 +18,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   late GlobalKey<FormBuilderState> _formKey;
+  late LoginController _loginController;
 
   @override
   void initState() {
     _formKey = GlobalKey<FormBuilderState>();
+    _loginController = Get.find<LoginController>();
 
     super.initState();
   }
@@ -38,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       log("Phone: $formattedPhone");
 
-      Get.toNamed("/otp", arguments: {"phone": formattedPhone});
+      _loginController.verifyPhone();
     } else {
       //  Show error snackbar
       Get.showSnackbar(
@@ -48,8 +51,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     }
-
-    _formKey.currentState?.reset();
   }
 
   @override
@@ -88,7 +89,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   AuthPhoneTextField(
-                    onChanged: (value) {},
+                    onChanged: (value) {
+                      _loginController.phoneChanged(value.toString());
+                    },
                   ),
                   const SizedBox(height: 64),
                   PrimaryButton(
